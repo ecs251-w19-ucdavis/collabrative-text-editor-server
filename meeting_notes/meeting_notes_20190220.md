@@ -8,7 +8,7 @@
   * Convergence
   * Causal order 
   * Intention preservation
-Currently, We found the `Operational transformation` be a potential solution to the race condition when users edit the same portion documents. 
+    * Currently, We found the `Operational transformation` be a potential solution to the race condition when users edit the same portion documents. 
 
 ## Completed this week
 * We have designed the initial version of frontend using the Javascript.
@@ -31,7 +31,7 @@ Currently, We found the `Operational transformation` be a potential solution to 
 * Achieve the collabrative editing between two users on one document.
 
 ## Problem
-* Now, we are considering the intention preservation problem, which using the OT algorithm to achieve it or maybe it would be better that we can lauch the other simple lock session to supervise the user's action to solve it.
+* Now, we are considering the intention preservation problem, which using the OT algorithm to achieve it.  We are not sure it would be better by launching the other simple lock session to supervise the user's action to solve it.
 
 
 ## Trello
