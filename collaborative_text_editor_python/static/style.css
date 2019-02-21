@@ -1,0 +1,52 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow-y: hidden;
+}
+
+#container {
+    display: flex;
+    height: 100%;
+    flex-wrap: wrap;
+}
+
+#editor {
+    width: 70%;
+    height: 100%;
+    resize: none;
+}
+
+#panel {
+    width: 30%;
+    height: 100%;
+}
+
+#legendBoard {
+    height: 100px;
+    background-color: aqua;
+}
+
+#inputBoard {
+    margin: 0;
+    height: 100px;
+    position: relative;
+    bottom: 0;
+    background-color: burlywood;
+}
+
+#messageBoard {
+    background-color: aquamarine;
+}
+
+#input {
+    width: 70%;
+    height: 100%;
+    resize: none;
+    float: left;
+}
+
+#submit {
+    margin: 0;
+    width: 30%;
+    height: 100%;
+}
