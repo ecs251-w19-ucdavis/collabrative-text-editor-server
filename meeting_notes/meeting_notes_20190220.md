@@ -26,3 +26,5 @@ Currently, We found the `Operational transformation` be a potential solution.
 * Plan to continue to render the frondend layout to make it better.
 * Achieve the collabrative editing between two users on one document.
   
+## Trello
+https://trello.com/b/14SEM7Ys/collaborativeeditor
