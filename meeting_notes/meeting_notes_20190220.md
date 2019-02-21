@@ -25,6 +25,10 @@ Currently, We found the `Operational transformation` be a potential solution.
 ## To do 
 * Plan to continue to render the frondend layout to make it better.
 * Achieve the collabrative editing between two users on one document.
-  
+
+## Questions?
+* We are considering to use the OT algorithm to achieve the collabrative text editor. 
+At the same time, we are not sure maybe it would be better to lauch the other simple lock session to supervise the user's action?
+
 ## Trello
-https://trello.com/b/14SEM7Ys/collaborativeeditor
+https://trello.com/b/mojw0uyH/os-251
