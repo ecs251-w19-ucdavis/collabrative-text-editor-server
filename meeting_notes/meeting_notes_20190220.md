@@ -26,9 +26,13 @@ Currently, We found the `Operational transformation` be a potential solution.
 * Plan to continue to render the frondend layout to make it better.
 * Achieve the collabrative editing between two users on one document.
 
-## Questions?
-* We are considering to use the OT algorithm to achieve the collabrative text editor. 
-At the same time, we are not sure maybe it would be better to lauch the other simple lock session to supervise the user's action?
+## Problem
+* The basic problems which we are trying to solve are:
+  * Convergence
+  * Causal order 
+  * Cntention preservation
+* Now, we are considering the intention preservation problem, which using the OT algorithm to achieve it or maybe it would be better that we can lauch the other simple lock session to supervise the user's action to solve it.
+
 
 ## Trello
 https://trello.com/b/mojw0uyH/os-251
