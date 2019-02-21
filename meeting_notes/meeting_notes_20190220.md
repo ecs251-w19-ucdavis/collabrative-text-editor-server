@@ -3,8 +3,12 @@
 ### Date 2019.2.20
 
 ## Idea discussion
-* This week we looked into how to solve the race condition when users edit the same portion documents. 
-Currently, We found the `Operational transformation` be a potential solution.
+* This week we looked into how to build the system and which problem we need to solve.
+* After digging out the paper, the basic problems which we are trying to solve are:
+  * Convergence
+  * Causal order 
+  * Intention preservation
+Currently, We found the `Operational transformation` be a potential solution to the race condition when users edit the same portion documents. 
 
 ## Completed this week
 * We have designed the initial version of frontend using the Javascript.
@@ -27,10 +31,6 @@ Currently, We found the `Operational transformation` be a potential solution.
 * Achieve the collabrative editing between two users on one document.
 
 ## Problem
-* The basic problems which we are trying to solve are:
-  * Convergence
-  * Causal order 
-  * Cntention preservation
 * Now, we are considering the intention preservation problem, which using the OT algorithm to achieve it or maybe it would be better that we can lauch the other simple lock session to supervise the user's action to solve it.
 
 
