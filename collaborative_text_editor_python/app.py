@@ -1,9 +1,12 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, join_room
+from flask_sqlalchemy import SQLAlchemy
 from flask import session
 
 app = Flask(__name__)
 socketio = SocketIO(app)
+# db object
+db = SQLAlchemy(app)
 
 
 @app.route('/')
