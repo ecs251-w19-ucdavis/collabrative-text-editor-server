@@ -32,16 +32,6 @@ def recieve_msg(json, methods=['GET', 'POST']):
 def handle_my_custom_event(json, methods=['GET', 'POST']):
     socketio.emit('DOC', json, room=json["room"])
 
-@socketio.on('get_files')
-def get_files(json, methods = ['GET', 'POST']):
-    userID = json["userID"]
-    files = UserTable.query.filter_by(field=userID)
-    response = []
-    for file in files:
-        response.append(file.docName)
-    response = json.dumps(response)
-    # return response to the client
-
 @socketio.on('create_file')
 def create_file(json, methods = ['GET', 'POST']):
     userID = json["userID"]
@@ -62,6 +52,16 @@ def create_file(json, methods = ['GET', 'POST']):
 
     # client should open the file now
 
+@socketio.on('get_files')
+def get_files(json, methods = ['GET', 'POST']):
+    userID = json["userID"]
+    files = UserTable.query.filter_by(field=userID)
+    response = []
+    for file in files:
+        response.append(file.docName)
+    response = json.dumps(response)
+    # return response to the client
+
 @socketio.on('read_file')
 def read_file(json, methods = ['GET', 'POST']):
     userID = json["userID"]
@@ -71,6 +71,22 @@ def read_file(json, methods = ['GET', 'POST']):
     with open(docID+".txt","r") as file:
         response = file.read
     response = json.dumps(response)
+    # return response to the client
+
+@socketio.on('join_file')
+def join_file(json, methods = ['GET', 'POST']):
+    userID = json["userID"]
+    docName = json["docName"]
+
+    # check if the user is already collaborating this file
+    if User.query.filter_by(userID=userID, docName=docName):
+        #return error message to the client
+        pass
+
+    docID = UserTable.query.filter_by(userID=userID, docName=docName).first().docID
+    user = User(userID=userID, docName=docName, docID=docID)
+    db.session.add(user)
+    db.commit()
     # return response to the client
 
 if __name__ == '__main__':
