@@ -8,8 +8,8 @@
         window.onload = setupWebSocket;
         window.onhashchange = setupWebSocket;
 
-        if (!window.location.hash) { // document-id not present in url
-            const newDocumentId = Date.now().toString(36); // this should be more random
+        if (!window.location.hash) {
+            const newDocumentId = Date.now().toString(36); 
             window.history.pushState(null, null, "#" + newDocumentId);
         }
 
