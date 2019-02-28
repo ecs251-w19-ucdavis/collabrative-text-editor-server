@@ -55,7 +55,7 @@ def create_file(json, methods = ['GET', 'POST']):
 @socketio.on('get_files')
 def get_files(json, methods = ['GET', 'POST']):
     userID = json["userID"]
-    files = UserTable.query.filter_by(field=userID)
+    files = User.query.filter_by(userID=userID)
     response = []
     for file in files:
         response.append(file.docName)
@@ -66,7 +66,7 @@ def get_files(json, methods = ['GET', 'POST']):
 def read_file(json, methods = ['GET', 'POST']):
     userID = json["userID"]
     docName = json["docName"]
-    user = UserTable.query.filter_by(userID=userID, docName=docName).first()
+    user = User.query.filter_by(userID=userID, docName=docName).first()
     docID = user.docID
     with open(docID+".txt","r") as file:
         response = file.read
@@ -83,7 +83,7 @@ def join_file(json, methods = ['GET', 'POST']):
         #return error message to the client
         pass
 
-    docID = UserTable.query.filter_by(userID=userID, docName=docName).first().docID
+    docID = User.query.filter_by(userID=userID, docName=docName).first().docID
     user = User(userID=userID, docName=docName, docID=docID)
     db.session.add(user)
     db.commit()
