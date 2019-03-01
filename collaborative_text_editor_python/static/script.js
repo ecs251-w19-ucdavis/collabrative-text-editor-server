@@ -12,7 +12,6 @@ while (userId == "") {
 }
 
 var server_socket = io.connect('http://' + document.domain + ':' + location.port);
-var doc_socket = io("/");
 var doc_ID;
 var doc_name;
 server_socket.on('connect', function () {
@@ -24,7 +23,7 @@ server_socket.on('response_doc_list', function (doc_list) {
     var instruction = "";
 
     for (var i = 0; i < doc_list.length; i++) {
-        instruction += i + ". " + doc_list[i]["docName"];
+        instruction += i + ". " + doc_list[i]["docName"] + "\n";
     }
     instruction += doc_list.length + ". " + "Create new document";
     while (choice == "" || parseInt(choice) > doc_list.length) {
@@ -47,60 +46,53 @@ server_socket.on('response_doc_list', function (doc_list) {
     } else {
         doc_ID = doc_list[parseInt(choice)]["docID"];
         doc_name = doc_list[parseInt(choice)]["docName"]
-        server_socket.emit("request_doc_content", {"docName":doc_name, "docID":doc_ID, "userID":userId});
+        server_socket.emit("request_doc_content", {"docName": doc_name, "docID": doc_ID, "userID": userId});
     }
 });
 
 server_socket.on('response_create_doc', function (data) {
     doc_ID = data["docID"];
-    doc_socket = io("/" + data["docID"]);
-    defineServerCommunication(doc_socket)
+    console.log(doc_ID);
 });
 
 server_socket.on("response_doc_content", function (doc_data) {
     document.getElementById("editor").value = doc_data["content"];
-    doc_socket = io("/" + doc_data["docID"]);
-    defineServerCommunication(doc_socket);
 });
 
-function defineServerCommunication(doc_socket) {
-    doc_socket.on('connect', function () {
-        doc_socket.emit('join', {"user": userId, "docID": doc_ID});
-    });
+server_socket.on('join', function (data) {
+    var msgBoard = document.getElementById("messageBoard");
+    msgBoard.innerHTML += data['msg'] + "<br>";
+});
 
-    doc_socket.on('join', function (data) {
-        var msgBoard = document.getElementById("messageBoard");
-        msgBoard.innerHTML += data['msg'] + "<br>";
-    });
+server_socket.on('MSG', function (data) {
+    var msgBoard = document.getElementById("messageBoard");
+    msgBoard.innerHTML += data["user"] + ": " + data['text'] + "<br>";
+});
 
-    doc_socket.on('MSG', function (data) {
-        var msgBoard = document.getElementById("messageBoard");
-        msgBoard.innerHTML += data["user"] + ": " + data['text'] + "<br>";
-    });
+server_socket.on('DOC', function (data) {
+    if (data["user"] != userId) {
+        document.getElementById("editor").value = data['doc'];
+    }
+});
 
-    doc_socket.on('DOC', function (data) {
-        if (data["user"] != userId) {
-            document.getElementById("editor").value = data['doc'];
-        }
-    });
-}
 
 function keyUpMSG(event) {
     var msg = document.getElementById("input").value;
     var x = event.which || event.keyCode;
     if (x == 13) {
-        doc_socket.emit('MSG', {
+        server_socket.emit('MSG', {
             "user": userId,
             "text": msg,
             "docID": doc_ID
-        }, namespace = "/" + doc_ID);
+        });
         document.getElementById("input").value = "";
     }
 }
 
 function keyUpDOC(event) {
+    console.log("Editor key up");
     var doc = document.getElementById("editor").value;
-    doc_socket.emit('DOC', {"doc": doc, "user": userId, "docID": doc_ID});
+    server_socket.emit('DOC', {"doc": doc, "user": userId, "docID": doc_ID});
 }
 
 function share() {
@@ -113,6 +105,7 @@ function share() {
 }
 
 function save_doc() {
+    console.log("saveclicked");
     var doc = document.getElementById("editor").value;
-    server_socket.emit("save", {"docID": doc_ID, "doc": doc});
+    server_socket.emit("save_doc", {"docID": doc_ID, "doc": doc});
 }

@@ -5,6 +5,7 @@ from flask import session
 import uuid
 import json
 
+
 app = Flask(__name__)
 socketio = SocketIO(app)
 
@@ -18,8 +19,12 @@ class User(db.Model):
     docID = db.Column(db.String, nullable=True)
 
 
-db.create_all()
+class Document(db.Model):
+    docID = db.Column(db.String, primary_key=True)
+    content = db.Column(db.String)
 
+
+db.create_all()
 db.session.commit()
 
 
@@ -28,19 +33,17 @@ def index():
     return render_template('index.html')
 
 
-@socketio.on('join')
-def joined(message, methods=['GET', 'POST']):
-    socketio.emit('join', {'msg': message["user"] + ' has entered the room.'}, namespace="/" + message["docID"])
-
-
 @socketio.on('MSG')
 def recieve_msg(json, methods=['GET', 'POST']):
-    socketio.emit('MSG', json, namespace="/" + json["docID"])
+    socketio.emit('MSG', json, room=json["docID"])
 
 
 @socketio.on('DOC')
-def recieve_doc(json, methods=['GET', 'POST']):
-    socketio.emit('DOC', json, namespace="/" + json["docID"])
+def receive_doc_update(json, methods=['GET', 'POST']):
+    document = Document.query.filter_by(docID=json["docID"]).first()
+    document.content = json["doc"]
+    db.session.commit()
+    socketio.emit('DOC', json, room=json["docID"])
 
 
 @socketio.on('create_new_doc')
@@ -48,12 +51,15 @@ def create_file(json, methods=['GET', 'POST']):
     userID = json["userID"]
     docID = str(uuid.uuid4())
     docName = json["docName"]
+    join_room(docID)
 
     user = User(userID=userID, docName=docName, docID=docID)
     with open(docID + ".txt", "w") as file:
-        print()
         file.write('')
+        file.close()
     db.session.add(user)
+    doc = Document(docID=docID, content="")
+    db.session.add(doc)
     db.session.commit()
 
     socketio.emit('response_create_doc', {"docID":docID},room=userID)
@@ -75,9 +81,10 @@ def get_files(json, methods=['GET', 'POST']):
 def read_file(json, methods=['GET', 'POST']):
     docID = json["docID"]
     userID = json["userID"]
-    with open(docID + ".txt", "r") as file:
-        response = file.read()
-        socketio.emit('response_doc_content', {"docID":docID, "content":response},room=userID)
+    join_room(docID)
+    response = Document.query.filter_by(docID=docID).first().content
+    socketio.emit('response_doc_content', {"docID":docID, "content":response},room=userID)
+    socketio.emit('join', {'msg': userID + ' has entered the room.'}, room=docID)
 
 
 @socketio.on('share')
@@ -95,12 +102,13 @@ def join_file(json, methods=['GET', 'POST']):
     db.session.commit()
 
 
-@socketio.on('save')
+@socketio.on('save_doc')
 def save_file(json, methods=['GET', 'POST']):
     docID = json["docID"]
-
+    print("save " + docID)
     with open(docID + ".txt", "w") as file:
         file.write(json["doc"])
+        file.close()
 
 
 if __name__ == '__main__':
