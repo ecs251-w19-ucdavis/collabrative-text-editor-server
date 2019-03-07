@@ -75,6 +75,11 @@ server_socket.on('DOC', function (data) {
     }
 });
 
+server_socket.on('run', function (data) {
+
+    document.getElementById("console").value += data['console'];
+
+});
 
 function keyUpMSG(event) {
     var msg = document.getElementById("input").value;
@@ -108,4 +113,9 @@ function save_doc() {
     console.log("saveclicked");
     var doc = document.getElementById("editor").value;
     server_socket.emit("save_doc", {"docID": doc_ID, "doc": doc});
+}
+
+function compileRun() {
+    save_doc();
+    server_socket.emit("run_doc", {"docID": doc_ID,"userID":userId});
 }

@@ -7,11 +7,16 @@
 </head>
 <body>
 <div id="container">
-    <textarea id="editor" placeholder="Type something ..." onkeyup="keyUpDOC(event)"></textarea>
+    <div id="left">
+        <textarea id="editor" placeholder="Type something ..." onkeyup="keyUpDOC(event)"></textarea>
+        <textarea id="compiler"></textarea>
+
+    </div>
     <div id="panel">
         <div id="legendBoard">
             <button type="button" onclick="share()">share</button>
             <button type="button" onclick="save_doc()">Save</button>
+            <button type="button" onclick="compileRun()">Run</button>
         </div>
         <div id="messageBoard"></div>
         <div id="inputBoard">

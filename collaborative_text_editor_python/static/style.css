@@ -10,10 +10,23 @@ body {
     flex-wrap: wrap;
 }
 
-#editor {
+#left {
     width: 70%;
     height: 100%;
+}
+
+#editor {
+    height: 60%;
+    width: 100%;
     resize: none;
+}
+
+#compiler {
+    height: 40%;
+    width: 100%;
+    color: white;
+    resize: none;
+    background-color: black;
 }
 
 #panel {

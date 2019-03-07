@@ -3,8 +3,8 @@ from flask_socketio import SocketIO, join_room
 from flask_sqlalchemy import SQLAlchemy
 from flask import session
 import uuid
+import subprocess
 import json
-from wordsmiths.transform import OT_String
 
 
 app = Flask(__name__)
@@ -55,7 +55,7 @@ def create_file(json, methods=['GET', 'POST']):
     join_room(docID)
 
     user = User(userID=userID, docName=docName, docID=docID)
-    with open(docID + ".txt", "w") as file:
+    with open(docID + ".c", "w") as file:
         file.write('')
         file.close()
     db.session.add(user)
@@ -107,28 +107,32 @@ def join_file(json, methods=['GET', 'POST']):
 def save_file(json, methods=['GET', 'POST']):
     docID = json["docID"]
     print("save " + docID)
-    with open(docID + ".txt", "w") as file:
+    with open(docID + ".c", "w") as file:
         file.write(json["doc"])
         file.close()
 
-@socketio.on('transform')
-def commit_transform(operations):
-    if str(operations['op1_type']) == "Insert":
-        op1 = [{"retain": int(operations['op1_index'])}, {"insert": str(operations['op1_string'])}]
-    if str(operations['op1_type']) == "Delete":
-        op1 = [{"retain": int(operations['op1_index'])}, {"delete": int(operations['op1_string'])}]
 
-    if str(operations['op2_type']) == "Insert":
-        op2 = [{"retain": int(operations['op2_index'])}, {"insert": str(operations['op2_string'])}]
-    if str(operations['op2_type']) == "Delete":
-        op2 = [{"retain": int(operations['op2_index'])}, {"delete": int(operations['op2_string'])}]
+@socketio.on('run_doc')
+def run_file(json, methods=['GET', 'POST']):
+    docID = json["docID"]
+    try:
+        output1 = subprocess.check_output(["gcc", "-o", docID, docID+".c"],stderr=subprocess.STDOUT,timeout=10)
+        socketio.emit('run', {'console': output1}, room=json["userID"])
+    except subprocess.CalledProcessError as e:
+        output1 = e.output
+        socketio.emit('run', {'console': output1}, room=json["userID"])
+        return
 
-    OT = OT_String("verbose")
+    try:
+        output2 = subprocess.check_output([docID],stderr=subprocess.STDOUT,timeout=10)
+        socketio.emit('run', {'console': output2}, room=json["userID"])
+    except subprocess.CalledProcessError as e:
+        output2 = e.output
+        socketio.emit('run', {'console': output2}, room=json["userID"])
+        return
 
-    new_ops = OT.transform(op1, op2)
-    emit('new_ops', {'op1': str(op1), 'op2': str(op2), 'op1_prime': str(new_ops[0]), 'op2_prime': str(new_ops[1])})
-    emit('apply_original', {'op1_index': int(op1[0]['retain']), 'op1_string': str(op1[1]['insert']), 'op2_index': int(op2[0]['retain']), 'op2_string': str(op2[1]['insert'])})
-    emit('apply_transformed', {'op1_index': int(operations['op1_index']), 'op1_string': str(operations['op1_string']), 'op2_index': int(operations['op2_index']), 'op2_string': str(operations['op2_string'])})
+
+
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0')
