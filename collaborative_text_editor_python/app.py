@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import session
 import uuid
 import json
+from wordsmiths.transform import OT_String
 
 
 app = Flask(__name__)
