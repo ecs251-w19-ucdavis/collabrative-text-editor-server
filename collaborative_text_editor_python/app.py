@@ -107,9 +107,10 @@ def receive_doc_update(json, methods=['GET', 'POST']):
     db.session.commit()
     with lock:
         server_version += 1
-    print("version:"+str(server_version))
+    # print("version:"+str(server_version))
     json['doc'] = document.content
     json['version'] = str(server_version)
+    print(json['version'])
     socketio.emit('DOC', json, room=json["docID"])
 
 
