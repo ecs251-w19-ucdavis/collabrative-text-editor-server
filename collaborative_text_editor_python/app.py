@@ -77,7 +77,6 @@ def receive_doc_update(json, methods=['GET', 'POST']):
         op = [{"retain": int(op_index)}, {"delete": 1}]
 
     with lock:
-        version += 1
         queue.push((op, version))
     with lock:
         (cur_op, cur_version) = queue.pop()
@@ -102,6 +101,9 @@ def receive_doc_update(json, methods=['GET', 'POST']):
 
     document.content = content
     db.session.commit()
+    with lock:
+        version += 1
+    
     socketio.emit('DOC', json, room=json["docID"])
 
 
