@@ -1,3 +1,8 @@
+# Reference Link: https://github.com/Schmallon/ot/blob/master/ot.py
+
+# Here is the clear version to check usually how OT works on client and server terminal.
+# Giving the straight version to understand how to implement on server and client.
+
 from operations import Noop, Compose, Reverted
 
 def xform(a, b):
