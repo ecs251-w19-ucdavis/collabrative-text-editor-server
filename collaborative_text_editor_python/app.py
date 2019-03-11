@@ -69,7 +69,7 @@ def receive_doc_update(json, methods=['GET', 'POST']):
     # for deletion, op_char is empty
     op_char = json['op_char']
     op_index = json['op_index']
-    version = json['version']
+    version = int(json['version'])
 
     if op_type == "Insert":
         op = [{"retain": int(op_index)}, {"insert": op_char}]
@@ -103,7 +103,7 @@ def receive_doc_update(json, methods=['GET', 'POST']):
     db.session.commit()
     with lock:
         version += 1
-    
+
     socketio.emit('DOC', json, room=json["docID"])
 
 
