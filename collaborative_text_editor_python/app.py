@@ -1,3 +1,4 @@
+from __future__ import print_function
 from flask import Flask, render_template
 from flask_socketio import SocketIO, join_room
 from flask_sqlalchemy import SQLAlchemy
@@ -5,8 +6,10 @@ from flask import session
 import uuid
 import subprocess
 import json
+import sys
 from threading import Lock
 from wordsmiths import OT_String
+
 
 
 app = Flask(__name__)
@@ -31,14 +34,13 @@ class MyQueue():
 
     def push(self, op):
         self.queue.append(op)
-        if head == None:
+        if self.head == None:
             self.head = 0
-        else:
-            self.head += 1
 
     def pop(self):
-        temp = self.queue[head]
-        head += 1
+        print(self.queue)
+        temp = self.queue[self.head]
+        self.head += 1
         return temp
 
 db.create_all()
@@ -47,7 +49,7 @@ db.session.commit()
 # global variables
 queue = MyQueue()
 lock = Lock()
-version = 0
+server_version = 0
 
 @app.route('/')
 def index():
@@ -63,8 +65,9 @@ def recieve_msg(json, methods=['GET', 'POST']):
 def receive_doc_update(json, methods=['GET', 'POST']):
     global queue
     global lock
-    global version
+    global server_version
 
+    print(json, file=sys.stdout)
     temp = json['op']
     op_type = temp['op_type']
     # for deletion, op_char is empty
@@ -83,7 +86,7 @@ def receive_doc_update(json, methods=['GET', 'POST']):
         (cur_op, cur_version) = queue.pop()
 
     # performing transformation until the op is sync with the current version on server
-    while cur_version < version:
+    while cur_version < server_version:
         OT = OT_String("verbose")
         prev_ops = MyQueue.queue[cur_version][0]
         # OT.transform will return a tuple containing op1_prime and op2_prime
@@ -103,10 +106,10 @@ def receive_doc_update(json, methods=['GET', 'POST']):
     document.content = content
     db.session.commit()
     with lock:
-        version += 1
-
+        server_version += 1
+    print("version:"+str(server_version))
     json['doc'] = document.content
-    json['version'] = version
+    json['version'] = str(server_version)
     socketio.emit('DOC', json, room=json["docID"])
 
 

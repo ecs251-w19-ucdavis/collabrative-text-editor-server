@@ -74,6 +74,7 @@ server_socket.on('DOC', function (data) {
     if (data["user"] != userId) {
         document.getElementById("editor").value = data['doc'];
     }
+    version = data['version']
 });
 
 server_socket.on('run', function (data) {
