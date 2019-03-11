@@ -7,6 +7,7 @@ msgBoard.style.height = container.clientHeight - inputBoard.clientHeight - legen
 
 
 var userId = "";
+var version = 0;
 while (userId == "") {
     userId = prompt("Please enter your UserId", "");
 }
@@ -94,10 +95,26 @@ function keyUpMSG(event) {
     }
 }
 
-function keyUpDOC(event) {
-    console.log("Editor key up");
+function keyPressDOC(event) {
     var doc = document.getElementById("editor").value;
-    server_socket.emit('DOC', {"doc": doc, "user": userId, "docID": doc_ID});
+    //server_socket.emit('DOC', {"doc": doc, "user": userId, "docID": doc_ID});
+    console.log(event.key);
+    var cursorPosition = $('#editor').prop("selectionStart");
+    var op = {"op_type": "Insert", "op_char": event.key, "op_index": cursorPosition};
+    console.log(op);
+
+    server_socket.emit('DOC', {"op": op, "user": userId, "docID": doc_ID, "version": version});
+}
+
+
+function keyDownDOC(event) {
+    if (event.which == 8) {
+        var cursorPosition = $('#editor').prop("selectionStart");
+        if(cursorPosition == 0) return;
+        var op = {"op_type": "Delete", "op_index": cursorPosition,"op_char": ""};
+        console.log(op);
+        server_socket.emit('DOC', {"op": op, "user": userId, "docID": doc_ID, "version": version});
+    }
 }
 
 function share() {
@@ -117,5 +134,5 @@ function save_doc() {
 
 function compileRun() {
     save_doc();
-    server_socket.emit("run_doc", {"docID": doc_ID,"userID":userId});
+    server_socket.emit("run_doc", {"docID": doc_ID, "userID": userId});
 }
