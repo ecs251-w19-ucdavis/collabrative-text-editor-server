@@ -5,6 +5,8 @@ from flask import session
 import uuid
 import subprocess
 import json
+from threading import Lock
+from wordsmiths import OT_String
 
 
 app = Flask(__name__)
@@ -12,7 +14,6 @@ socketio = SocketIO(app)
 
 # db object
 db = SQLAlchemy(app)
-
 
 class User(db.Model):
     userID = db.Column(db.String, primary_key=True)
@@ -24,10 +25,29 @@ class Document(db.Model):
     docID = db.Column(db.String, primary_key=True)
     content = db.Column(db.String)
 
+class MyQueue():
+    queue = []
+    head = None
+
+    def push(self, op):
+        self.queue.append(op)
+        if head == None:
+            self.head = 0
+        else:
+            self.head += 1
+
+    def pop(self):
+        temp = self.queue[head]
+        head += 1
+        return temp
 
 db.create_all()
 db.session.commit()
 
+# global variables
+queue = MyQueue()
+lock = Lock()
+version = 0
 
 @app.route('/')
 def index():
@@ -41,8 +61,46 @@ def recieve_msg(json, methods=['GET', 'POST']):
 
 @socketio.on('DOC')
 def receive_doc_update(json, methods=['GET', 'POST']):
+    global queue
+    global lock
+    global version
+
+    op_type = json['op_type']
+    # for deletion, op_char is empty
+    op_char = json['op_char']
+    op_index = json['op_index']
+    version = json['version']
+
+    if op_type == "Insert":
+        op = [{"retain": int(op_index)}, {"insert": op_char}]
+    if op_type == "Delete":
+        op = [{"retain": int(op_index)}, {"delete": 1}]
+
+    with lock:
+        version += 1
+        queue.push((op, version))
+    with lock:
+        (cur_op, cur_version) = queue.pop()
+
+    # performing transformation until the op is sync with the current version on server
+    while cur_version < version:
+        OT = OT_String("verbose")
+        prev_ops = MyQueue.queue[cur_version][0]
+        # OT.transform will return a tuple containing op1_prime and op2_prime
+        cur_op = OT.transform(prev_ops, cur_op)[1]
+        cur_version += 1
+
+    index = op[0]["retain"]
+    cur_op = op[1]
     document = Document.query.filter_by(docID=json["docID"]).first()
-    document.content = json["doc"]
+    content = document.content
+
+    if "insert" in cur_op:
+        content = content[:index] + cur_op["insert"] + content[index:]
+    elif "delete" in cur_op:
+        content = content[:index] + content[index+1:]
+
+    document.content = content
     db.session.commit()
     socketio.emit('DOC', json, room=json["docID"])
 
