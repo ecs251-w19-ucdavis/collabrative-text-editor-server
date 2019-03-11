@@ -65,10 +65,11 @@ def receive_doc_update(json, methods=['GET', 'POST']):
     global lock
     global version
 
-    op_type = json['op_type']
+    temp = json['op']
+    op_type = temp['op_type']
     # for deletion, op_char is empty
-    op_char = json['op_char']
-    op_index = json['op_index']
+    op_char = temp['op_char']
+    op_index = temp['op_index']
     version = int(json['version'])
 
     if op_type == "Insert":
@@ -104,6 +105,8 @@ def receive_doc_update(json, methods=['GET', 'POST']):
     with lock:
         version += 1
 
+    json['doc'] = document.content
+    json['version'] = version
     socketio.emit('DOC', json, room=json["docID"])
 
 
