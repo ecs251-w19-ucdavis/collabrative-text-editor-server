@@ -78,7 +78,7 @@ def receive_doc_update(json, methods=['GET', 'POST']):
     if op_type == "Insert":
         op = [{"retain": int(op_index)}, {"insert": op_char}]
     if op_type == "Delete":
-        op = [{"retain": int(op_index)}, {"delete": 1}]
+        op = [{"retain": int(op_index)-1}, {"delete": 1}]
 
     with lock:
         queue.push((op, version))
@@ -147,11 +147,12 @@ def get_files(json, methods=['GET', 'POST']):
 
 @socketio.on('request_doc_content')
 def read_file(json, methods=['GET', 'POST']):
+    global version
     docID = json["docID"]
     userID = json["userID"]
     join_room(docID)
     response = Document.query.filter_by(docID=docID).first().content
-    socketio.emit('response_doc_content', {"docID":docID, "content":response},room=userID)
+    socketio.emit('response_doc_content', {"docID":docID, "content":response, "version":version},room=userID)
     socketio.emit('join', {'msg': userID + ' has entered the room.'}, room=docID)
 
 

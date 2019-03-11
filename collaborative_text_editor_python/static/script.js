@@ -102,7 +102,11 @@ function keyPressDOC(event) {
     //server_socket.emit('DOC', {"doc": doc, "user": userId, "docID": doc_ID});
     console.log(event.key);
     var cursorPosition = $('#editor').prop("selectionStart");
-    var op = {"op_type": "Insert", "op_char": event.key, "op_index": cursorPosition};
+    var c = event.key;
+    if(event.which == 13){
+      c = "\n";
+    }
+    var op = {"op_type": "Insert", "op_char": c, "op_index": cursorPosition};
     console.log(op);
 
     server_socket.emit('DOC', {"op": op, "user": userId, "docID": doc_ID, "version": version});
