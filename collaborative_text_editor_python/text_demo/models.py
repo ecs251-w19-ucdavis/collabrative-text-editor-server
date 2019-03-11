@@ -1,3 +1,6 @@
+# Because it is easier to use flask framework to achieve the real-time server building.
+# Here is the database usage demo on flask, which we will use SQLAlchemy for our codes implement.
+
 from app import db
 from flask.ext.sqlalchemy import SQLAlchemy
 
