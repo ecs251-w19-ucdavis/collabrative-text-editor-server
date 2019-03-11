@@ -58,6 +58,7 @@ server_socket.on('response_create_doc', function (data) {
 
 server_socket.on("response_doc_content", function (doc_data) {
     document.getElementById("editor").value = doc_data["content"];
+    version = doc_data["version"];
 });
 
 server_socket.on('join', function (data) {
