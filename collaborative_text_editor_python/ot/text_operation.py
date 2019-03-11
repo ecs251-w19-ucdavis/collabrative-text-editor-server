@@ -1,3 +1,23 @@
+# Reference Link: https://github.com/Operational-Transformation/ot.py
+
+# The best way to understand what is OT, and how it works.
+
+# From the OT, we will originally define whole user's editing into three ops(Insert, Retain, and Delete).
+# Every chance will be represented as an operation so that the current document could be updated according to the op. 
+# The initial aim of OT is to preverse the user's intention when we met the concorrent situation.
+
+# For example, if we apply OT:
+# On client will see:
+# Starting State: abc
+# User1: Op1: Insert "0, "x"" -> xabc.
+# User2. Op2: Delete "2" -> ab
+
+# On server will see:
+# Starting State -> abc
+# User1: Op2' = Transform(Op2, Op1) = Delete "3" = xab
+# User2: Op1' = Transform(Op1, Op2) = Insert "0, 'x'" = xab
+
+
 
 ns are lists of ops. There are three types of ops:
 #
