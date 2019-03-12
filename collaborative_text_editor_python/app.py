@@ -119,7 +119,6 @@ def receive_doc_update(json):
     print('doc:' + str(doc_on_switch))
 
     if doc_on_switch == '0':
-
         # adds common version with doc in and doc out
         document = Document.query.filter_by(docID=json["docID"]).first()
         document.content = json["doc"]
@@ -127,7 +126,6 @@ def receive_doc_update(json):
         socketio.emit('DOC', json, room=json["docID"])
 
     elif doc_on_switch == '1':
-
         # OT algorithms
         # successfully debug version of OTs.
         temp = json['op']
@@ -146,31 +144,28 @@ def receive_doc_update(json):
             queue.push((op, version))
         with lock:
             (cur_op, cur_version) = queue.pop()
-        # print(queue)
         # performing transformation until the op is sync with the current version on server
         while cur_version < server_version:
+
             OT = OT_String("verbose")
             prev_ops = MyQueue.queue[cur_version][0]
             print('Op1:' + str(prev_ops))
             print('Op2:' + str(op))
-
-            # -------Revised Myer diff algorithm--------------------
-            # successfully implement for diff patch algorithms.
-            op1 = str(prev_ops)
-            op2 = str(op)
-            diff = myers_diff(op1, op2)
-            for elem in diff:
-                if isinstance(elem, Keep):
-                    print(' ' + elem.line)
-                elif isinstance(elem, Insert):
-                    print('+' + elem.line)
-                else:
-                    print('-' + elem.line)
-            print('---testing myer op operation--')
-
             op = OT.transform(prev_ops, op)[1]
-            print('Op_tranform:' + str(op))
 
+            # print('---testing myer op operation--')
+            # op1 = str(prev_ops)
+            # op2 = str(op)
+            # diff = myers_diff(op1, op2)
+            # for elem in diff:
+            #     if isinstance(elem, Keep):
+            #         print(' ' + elem.line)
+            #     elif isinstance(elem, Insert):
+            #         print('+' + elem.line)
+            #     else:
+            #         print('-' + elem.line)
+
+            print('Op_tranform:' + str(op))
             # -------Revised OT algorithm--------------------
             # We only pick the op2 here,
             #    op1: xab op2:aby
@@ -205,7 +200,31 @@ def receive_doc_update(json):
         # print(json['version'])
         print("content: " + json['doc'])
         socketio.emit('DOC', json, room=json["docID"])
-    # else:
+
+    elif doc_on_switch == '2':
+        # -------Revised Myer diff algorithm--------------------
+        # successfully implement for diff patch algorithms.
+        document = Document.query.filter_by(docID=json["docID"]).first()
+        document.content = json["doc"]
+        # should be init state from Client A from front end
+        init_state = str(document.content)
+        # should be update_op from Client B from front end
+        update_state = str(document.content)
+        print('---Myer op operation to get the diff--')
+        diff = myers_diff(init_state, update_state)
+        for elem in diff:
+            if isinstance(elem, Keep):
+                print(' ' + elem.line)
+            elif isinstance(elem, Insert):
+                print('+' + elem.line)
+            else:
+                print('-' + elem.line)
+        # should update here according to diff from the Myer's algorithm
+        document.content = update_state
+        # submit update
+        json['doc'] = document.content
+        db.session.commit()
+        socketio.emit('DOC', json, room=json["docID"])
 
 
 @socketio.on('create_new_doc')
