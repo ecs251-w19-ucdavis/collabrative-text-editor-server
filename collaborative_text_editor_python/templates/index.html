@@ -1,4 +1,13 @@
 <html>
+
+<head>
+<style type="text/css">
+p.normal {font-style:normal}
+p.italic {font-style:italic}
+p.oblique {font-style:oblique}
+</style>
+</head>
+
 <head>
     <meta charset="UTF-8">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -8,19 +17,24 @@
 </head>
 <body>
 <div id="container">
-    <div id="left">
+
+    <div id="left"><body>
+    <p class="italic">Final Project of ECS 251 - Team Gucci - Collaborative Text Editor</p>
+    </body>
         <textarea id="editor" placeholder="Type something ..." onkeypress="keyPressDOC(event)" onkeydown="keyDownDOC(event)"></textarea>
         <textarea id="compiler"></textarea>
 
     </div>
     <div id="panel">
         <div id="legendBoard">
-            <button type="button" onclick="share()">share</button>
+            <body><p class="oblique">Docs Options </p></body>
+            <button type="button" onclick="share()">Share</button>
             <button type="button" onclick="save_doc()">Save</button>
             <button type="button" onclick="compileRun()">Run</button>
             <select id="selector">
-                <option value="1">new</option>
-                <option value="0">old</option>
+                <option value="1">OTs-Algorithm</option>
+                <option value="0">Doc-Algorithm</option>
+                <option value="2">Myer's Diff</option>
             </select>
         </div>
         <div id="messageBoard"></div>

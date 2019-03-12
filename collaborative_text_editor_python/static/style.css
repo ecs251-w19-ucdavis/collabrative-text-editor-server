@@ -21,14 +21,22 @@ body {
     resize: none;
 }
 
+/*#compiler {*/
+    /*height: 40%;*/
+    /*width: 100%;*/
+    /*color: white;*/
+    /*resize: none;*/
+    /*background-color: black;*/
+/*}*/
+
 #panel {
     width: 30%;
     height: 100%;
 }
 
 #legendBoard {
-    height: 100px;
-    background-color: aqua;
+    height: 60px;
+    background-color: #bbbbbb;
 }
 
 #inputBoard {
@@ -36,11 +44,11 @@ body {
     height: 100px;
     position: relative;
     bottom: 0;
-    background-color: burlywood;
+        background-color: #ffffcc;
 }
 
 #messageBoard {
-    background-color: aquamarine;
+    background-color:  #FFF700;
 }
 
 #input {
@@ -48,4 +56,10 @@ body {
     height: 100%;
     resize: none;
     float: left;
+}
+
+#submit {
+    margin: 0;
+    width: 30%;
+    height: 100%;
 }
