@@ -90,7 +90,8 @@ def receive_doc_update(json, methods=['GET', 'POST']):
         OT = OT_String("verbose")
         prev_ops = MyQueue.queue[cur_version][0]
         # OT.transform will return a tuple containing op1_prime and op2_prime
-        cur_op = OT.transform(prev_ops, cur_op)[1]
+        op = OT.transform(prev_ops, op)[1]
+        print('cur_op:' + str(op))
         cur_version += 1
 
     index = op[0]["retain"]
