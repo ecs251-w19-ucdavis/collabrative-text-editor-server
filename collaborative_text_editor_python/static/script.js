@@ -99,6 +99,8 @@ function keyUpMSG(event) {
 
 function keyPressDOC(event) {
     var doc = document.getElementById("editor").value;
+    var selector = document.getElementById( "selector" );
+    var v = selector.options[ selector.selectedIndex].value;
     //server_socket.emit('DOC', {"doc": doc, "user": userId, "docID": doc_ID});
     console.log(event.key);
     var cursorPosition = $('#editor').prop("selectionStart");
@@ -109,7 +111,7 @@ function keyPressDOC(event) {
     var op = {"op_type": "Insert", "op_char": c, "op_index": cursorPosition};
     console.log(op);
 
-    server_socket.emit('DOC', {"op": op, "user": userId, "docID": doc_ID, "version": version});
+    server_socket.emit('DOC', {"op": op, "user": userId, "docID": doc_ID, "version": version, "option":v});
 }
 
 
@@ -117,9 +119,11 @@ function keyDownDOC(event) {
     if (event.which == 8) {
         var cursorPosition = $('#editor').prop("selectionStart");
         if(cursorPosition == 0) return;
+        var selector = document.getElementById( "selector" );
+        var v = selector.options[ selector.selectedIndex].value;
         var op = {"op_type": "Delete", "op_index": cursorPosition,"op_char": ""};
         console.log(op);
-        server_socket.emit('DOC', {"op": op, "user": userId, "docID": doc_ID, "version": version});
+        server_socket.emit('DOC', {"op": op, "user": userId, "docID": doc_ID, "version": version, "option":v});
     }
 }
 
