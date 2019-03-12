@@ -84,13 +84,19 @@ def receive_doc_update(json, methods=['GET', 'POST']):
         queue.push((op, version))
     with lock:
         (cur_op, cur_version) = queue.pop()
-
+    # print(queue)
     # performing transformation until the op is sync with the current version on server
     while cur_version < server_version:
         OT = OT_String("verbose")
         prev_ops = MyQueue.queue[cur_version][0]
-        # OT.transform will return a tuple containing op1_prime and op2_prime
+        print('Op1:'+str(prev_ops))
+        print('Op2:'+str(op))
+      # OT.transform will return a tuple containing op1_prime and op2_prime
         op = OT.transform(prev_ops, op)[1]
+        print('Op_tranform:'+str(op))
+        retain = {'retain': op['index']}
+        op.pop('index')
+        op = [retain, op]
         print('cur_op:' + str(op))
         cur_version += 1
 
@@ -101,6 +107,7 @@ def receive_doc_update(json, methods=['GET', 'POST']):
 
     if "insert" in cur_op:
         content = content[:index] + cur_op["insert"] + content[index:]
+        #print("content:"+content)
     elif "delete" in cur_op:
         content = content[:index] + content[index+1:]
 
@@ -111,7 +118,8 @@ def receive_doc_update(json, methods=['GET', 'POST']):
     # print("version:"+str(server_version))
     json['doc'] = document.content
     json['version'] = str(server_version)
-    print(json['version'])
+    #print(json['version'])
+    print("content: "+json['doc'])
     socketio.emit('DOC', json, room=json["docID"])
 
 
@@ -148,12 +156,12 @@ def get_files(json, methods=['GET', 'POST']):
 
 @socketio.on('request_doc_content')
 def read_file(json, methods=['GET', 'POST']):
-    global version
+    global server_version
     docID = json["docID"]
     userID = json["userID"]
     join_room(docID)
     response = Document.query.filter_by(docID=docID).first().content
-    socketio.emit('response_doc_content', {"docID":docID, "content":response, "version":version},room=userID)
+    socketio.emit('response_doc_content', {"docID":docID, "content":response, "version":server_version},room=userID)
     socketio.emit('join', {'msg': userID + ' has entered the room.'}, room=docID)
 
 

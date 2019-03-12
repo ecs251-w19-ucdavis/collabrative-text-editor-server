@@ -72,9 +72,7 @@ server_socket.on('MSG', function (data) {
 });
 
 server_socket.on('DOC', function (data) {
-    if (data["user"] != userId) {
-        document.getElementById("editor").value = data['doc'];
-    }
+    document.getElementById("editor").value = data['doc'];
     version = data['version']
 });
 
