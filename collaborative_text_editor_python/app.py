@@ -9,12 +9,9 @@ import json
 import sys
 from threading import Lock
 from wordsmiths import OT_String
-
 from collections import namedtuple
-import sys
 
-# These define the structure of the history, and correspond to diff output with
-# lines that start with a space, a + and a - respectively.
+# Basic op for Myer's algorithm
 Keep = namedtuple('Keep', ['line'])
 Insert = namedtuple('Insert', ['line'])
 Remove = namedtuple('Remove', ['line'])
@@ -22,59 +19,32 @@ Frontier = namedtuple('Frontier', ['x', 'history'])
 
 
 def myers_diff(a_lines, b_lines):
-    # This marks the farthest-right point along each diagonal in the edit
-    # graph, along with the history that got it there
-    """
-    An implementation of the Myers diff algorithm.
-    See http://www.xmailserver.org/diff2.pdf
-    """
+    # build the frontier in the edit graph
     frontier = {1: Frontier(0, [])}
-
     def one(idx):
         return idx - 1
-
     a_max = len(a_lines)
     b_max = len(b_lines)
     for d in range(0, a_max + b_max + 1):
         for k in range(-d, d + 1, 2):
-
-            # This determines whether our next search point will be going down
-            # in the edit graph, or to the right.
-            #
-            # The intuition for this is that we should go down if we're on the
-            # left edge (k == -d) to make sure that the left edge is fully
-            # explored.
-            #
-            # If we aren't on the top (k != d), then only go down if going down
-            # would take us to territory that hasn't sufficiently been explored
-            # yet.
+            # Search point will go down or to the right
             go_down = (k == -d or
                        (k != d and frontier[k - 1].x < frontier[k + 1].x))
-
-            # Figure out the starting point of this iteration. The diagonal
-            # offsets come from the geometry of the edit grid - if you're going
-            # down, your diagonal is lower, and if you're going right, your
-            # diagonal is higher.
             if go_down:
                 old_x, history = frontier[k + 1]
                 x = old_x
             else:
                 old_x, history = frontier[k - 1]
                 x = old_x + 1
-            # We want to avoid modifying the old history, since some other step
-            # may decide to use it.
+            # Get the old history
             history = history[:]
             y = x - k
-
-            # We start at the invalid point (0, 0) - we should only start building
-            # up history when we move off of it.
+            # Start at the invalid point (0, 0)
             if 1 <= y <= b_max and go_down:
                 history.append(Insert(b_lines[one(y)]))
             elif 1 <= x <= a_max:
                 history.append(Remove(a_lines[one(x)]))
-            # Chew up as many diagonal moves as we can - these correspond to common lines,
-            # and they're considered "free" by the algorithm because we want to maximize
-            # the number of these in the output.
+            # Diagnoal moves
             while x < a_max and y < b_max and a_lines[one(x + 1)] == b_lines[one(y + 1)]:
                 x += 1
                 y += 1
@@ -83,7 +53,7 @@ def myers_diff(a_lines, b_lines):
                 return history
             else:
                 frontier[k] = Frontier(x, history)
-    assert False, 'Could not find edit script'
+    assert False, '---Error, Could not find edit script---'
 
 
 app = Flask(__name__)
@@ -135,12 +105,12 @@ def index():
 
 
 @socketio.on('MSG')
-def recieve_msg(json, methods=['GET', 'POST']):
+def recieve_msg(json):
     socketio.emit('MSG', json, room=json["docID"])
 
 
 @socketio.on('DOC')
-def receive_doc_update(json, methods=['GET', 'POST']):
+def receive_doc_update(json):
     global queue
     global lock
     global server_version
@@ -239,7 +209,7 @@ def receive_doc_update(json, methods=['GET', 'POST']):
 
 
 @socketio.on('create_new_doc')
-def create_file(json, methods=['GET', 'POST']):
+def create_file(json):
     userID = json["userID"]
     docID = str(uuid.uuid4())
     docName = json["docName"]
@@ -259,7 +229,7 @@ def create_file(json, methods=['GET', 'POST']):
 
 
 @socketio.on('request_doc_list')
-def get_files(json, methods=['GET', 'POST']):
+def get_files(json):
     userID = json["userID"]
     join_room(userID)
     files = User.query.filter_by(userID=userID)
@@ -281,7 +251,7 @@ def read_file(json, methods=['GET', 'POST']):
 
 
 @socketio.on('share')
-def join_file(json, methods=['GET', 'POST']):
+def join_file(json):
     userID = json["userID"]
     docName = json["docName"]
     docID = json["docID"]
@@ -296,7 +266,7 @@ def join_file(json, methods=['GET', 'POST']):
 
 
 @socketio.on('save_doc')
-def save_file(json, methods=['GET', 'POST']):
+def save_file(json):
     docID = json["docID"]
     print("save " + docID)
     with open(docID + ".c", "w") as file:
@@ -305,7 +275,7 @@ def save_file(json, methods=['GET', 'POST']):
 
 
 @socketio.on('run_doc')
-def run_file(json, methods=['GET', 'POST']):
+def run_file(json):
     docID = json["docID"]
     try:
         output1 = subprocess.check_output(["gcc", "-o", docID, docID + ".c"], stderr=subprocess.STDOUT, timeout=10)

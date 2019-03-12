@@ -16,17 +16,9 @@ body {
 }
 
 #editor {
-    height: 60%;
+    height: 100%;
     width: 100%;
     resize: none;
-}
-
-#compiler {
-    height: 40%;
-    width: 100%;
-    color: white;
-    resize: none;
-    background-color: black;
 }
 
 #panel {
@@ -56,10 +48,4 @@ body {
     height: 100%;
     resize: none;
     float: left;
-}
-
-#submit {
-    margin: 0;
-    width: 30%;
-    height: 100%;
 }
