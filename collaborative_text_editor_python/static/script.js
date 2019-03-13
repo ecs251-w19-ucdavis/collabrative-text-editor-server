@@ -67,6 +67,8 @@ server_socket.on('response_create_doc', function(data) {
 
 server_socket.on("response_doc_content", function(doc_data) {
 	document.getElementById("editor").value = doc_data["content"];
+	console.log(doc_data["content"]);
+
 	version = doc_data["version"];
 });
 
@@ -82,6 +84,7 @@ server_socket.on('MSG', function(data) {
 
 server_socket.on('DOC', function(data) {
 	document.getElementById("editor").value = data['doc'];
+	console.log(data['doc']);
 	version = data['version']
 });
 
@@ -108,8 +111,6 @@ function keyPressDOC(event) {
 	var doc = document.getElementById("editor").value;
 	var selector = document.getElementById("selector");
 	var v = selector.options[selector.selectedIndex].value;
-	//server_socket.emit('DOC', {"doc": doc, "user": userId, "docID": doc_ID});
-	console.log(event.key);
 	var cursorPosition = $('#editor').prop("selectionStart");
 	var c = event.key;
 	if (event.which == 13) {
@@ -120,7 +121,6 @@ function keyPressDOC(event) {
 		"op_char": c,
 		"op_index": cursorPosition
 	};
-	console.log(op);
 	if (v == 1) {
 		server_socket.emit('DOC', {
 			"op": op,
@@ -129,6 +129,7 @@ function keyPressDOC(event) {
 			"version": version,
 			"option": v
 		});
+		console.log(op);
 	} else {
 		server_socket.emit('DOC', {
 			"doc": doc,
@@ -137,6 +138,7 @@ function keyPressDOC(event) {
 			"version": version,
 			"option": v
 		});
+		console.log(doc);
 	}
 }
 
@@ -152,7 +154,6 @@ function keyDownDOC(event) {
 			"op_index": cursorPosition,
 			"op_char": ""
 		};
-		console.log(op);
 		var doc = document.getElementById("editor").value;
 
 		if (v == 1) {
@@ -163,6 +164,7 @@ function keyDownDOC(event) {
 				"version": version,
 				"option": v
 			});
+			console.log(op);
 		} else {
 			server_socket.emit('DOC', {
 				"doc": doc,
@@ -171,6 +173,7 @@ function keyDownDOC(event) {
 				"version": version,
 				"option": v
 			});
+			console.log(doc);
 		}
 	}
 }
