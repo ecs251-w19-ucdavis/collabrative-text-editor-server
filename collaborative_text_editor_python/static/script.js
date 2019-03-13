@@ -84,7 +84,7 @@ server_socket.on('MSG', function(data) {
 
 server_socket.on('DOC', function(data) {
 	document.getElementById("editor").value = data['doc'];
-	console.log("Receive: "+ data['doc']);
+	console.log("Receive: " + data['doc']);
 	version = data['version']
 });
 
@@ -108,9 +108,11 @@ function keyUpMSG(event) {
 }
 
 function keyPressDOC(event) {
+
 	var doc = document.getElementById("editor").value;
 	var selector = document.getElementById("selector");
 	var v = selector.options[selector.selectedIndex].value;
+	if (v == 0) return;
 	var cursorPosition = $('#editor').prop("selectionStart");
 	var c = event.key;
 	if (event.which == 13) {
@@ -121,7 +123,30 @@ function keyPressDOC(event) {
 		"op_char": c,
 		"op_index": cursorPosition
 	};
-	if (v == 1) {
+	server_socket.emit('DOC', {
+		"op": op,
+		"user": userId,
+		"docID": doc_ID,
+		"version": version,
+		"option": v
+	});
+	console.log(op);
+}
+
+
+function keyDownDOC(event) {
+	if (event.which == 8) {
+		var v = selector.options[selector.selectedIndex].value;
+		if (v == 0) return;
+		var cursorPosition = $('#editor').prop("selectionStart");
+		if (cursorPosition == 0) return;
+		var selector = document.getElementById("selector");
+		var op = {
+			"op_type": "Delete",
+			"op_index": cursorPosition,
+			"op_char": ""
+		};
+
 		server_socket.emit('DOC', {
 			"op": op,
 			"user": userId,
@@ -130,53 +155,24 @@ function keyPressDOC(event) {
 			"option": v
 		});
 		console.log(op);
-	} else {
-		server_socket.emit('DOC', {
-			"doc": doc,
-			"user": userId,
-			"docID": doc_ID,
-			"version": version,
-			"option": v
-		});
-		console.log("send: "doc);
 	}
 }
 
 
-function keyDownDOC(event) {
-	if (event.which == 8) {
-		var cursorPosition = $('#editor').prop("selectionStart");
-		if (cursorPosition == 0) return;
-		var selector = document.getElementById("selector");
-		var v = selector.options[selector.selectedIndex].value;
-		var op = {
-			"op_type": "Delete",
-			"op_index": cursorPosition,
-			"op_char": ""
-		};
-		var doc = document.getElementById("editor").value;
+function inputChange() {
+	var v = selector.options[selector.selectedIndex].value;
+	if (v != 0) return;
 
-		if (v == 1) {
-			server_socket.emit('DOC', {
-				"op": op,
-				"user": userId,
-				"docID": doc_ID,
-				"version": version,
-				"option": v
-			});
-			console.log(op);
-		} else {
-			server_socket.emit('DOC', {
-				"doc": doc,
-				"user": userId,
-				"docID": doc_ID,
-				"version": version,
-				"option": v
-			});
-			console.log("send: "doc);
-		}
-	}
+	var doc = document.getElementById("editor").value;
+	server_socket.emit('DOC', {
+		"doc": doc,
+		"user": userId,
+		"docID": doc_ID,
+		"version": version,
+		"option": v
+	});
 }
+
 
 function share() {
 	var target = "";

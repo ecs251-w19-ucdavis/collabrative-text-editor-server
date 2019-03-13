@@ -21,7 +21,7 @@ p.oblique {font-style:oblique}
     <div id="left"><body>
     <p class="italic">Final Project of ECS 251 - Team Gucci - Collaborative Text Editor</p>
     </body>
-        <textarea id="editor" placeholder="Type something ..." onkeypress="keyPressDOC(event)" onkeydown="keyDownDOC(event)"></textarea>
+        <textarea id="editor" placeholder="Type something ..." oninput="inputChange();" onkeypress="keyPressDOC(event)" onkeydown="keyDownDOC(event)"></textarea>
         <textarea id="compiler"></textarea>
 
     </div>
