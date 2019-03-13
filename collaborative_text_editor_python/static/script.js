@@ -84,7 +84,7 @@ server_socket.on('MSG', function(data) {
 
 server_socket.on('DOC', function(data) {
 	document.getElementById("editor").value = data['doc'];
-	console.log(data['doc']);
+	console.log("Receive: "+ data['doc']);
 	version = data['version']
 });
 
@@ -138,7 +138,7 @@ function keyPressDOC(event) {
 			"version": version,
 			"option": v
 		});
-		console.log(doc);
+		console.log("send: "doc);
 	}
 }
 
@@ -173,7 +173,7 @@ function keyDownDOC(event) {
 				"version": version,
 				"option": v
 			});
-			console.log(doc);
+			console.log("send: "doc);
 		}
 	}
 }
