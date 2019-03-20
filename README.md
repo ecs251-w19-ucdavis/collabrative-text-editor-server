@@ -14,7 +14,15 @@
 * Save the document on the server
 * Real time collaborative editing with other users
 
-### Implementation Detail
+### Code Structure & Implementation Detail
+
+##### Code Structure 
+    |-collaborative_text_editor_python
+    |-- app.py        (including the implements of Basic / Mayer's diff / OT algorithm)
+    |-- db_create.py  (including the database)
+    |-- templates     (including the frond-end layout)
+    |-- static        (including how we send, share, save DOC with front-end and back-end)
+
 ##### Basic Framework
 * Socket io for DOC updating.
 * Basic / Mayer's diff / OT algorithm for achieving collabrative edting.
