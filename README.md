@@ -4,7 +4,8 @@
 * Install the requirement.txt of the "collaborative_text_editor_python" folder.
 * Launch the sever by using `python3 app.py`
 * Test the demo on `0.0.0.0:5000`
-* Verify the basic algorithm on our froned-end layout.
+* Verify the basic algorithm on the Doc Options of our froned-end layout.
+* <img src="meeting_notes/options.png" width="275">
 
 ### Features
 
