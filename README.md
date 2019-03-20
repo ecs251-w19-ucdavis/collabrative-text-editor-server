@@ -1,5 +1,11 @@
 # collabrative-text-editor-server
 
+### Configuration
+* Install the requirement.txt of the "collaborative_text_editor_python" folder.
+* Launch the sever by using `python3 app.py`
+* Test the demo on `0.0.0.0:5000`
+* Verify the basic algorithm on our froned-end layout.
+
 ### Features
 
 * User login
@@ -68,7 +74,10 @@
               op = [retain, op]
               cur_version += 1
   ```
-
   
 
 * After finishing OT, the server will apply the transformed operation on its document and pass the document to all the clients.
+
+### Evaluation
+We successfully evaluate demo by inserting the x and y to the begining and end of the initial status "abc".
+<img src="meeting_notes/evaluation.png">
