@@ -15,6 +15,9 @@
 * Real time collaborative editing with other users
 
 ### Implementation Detail
+##### Basic Framework
+* Socket io for DOC updating.
+* Basic / Mayer's diff / OT algorithm for achieving collabrative edting.
 
 ##### Client Document Storage
 
@@ -32,6 +35,28 @@
       docName = db.Column(db.String, primary_key=True, nullable=True)
       docID = db.Column(db.String, nullable=True)
   ```
+##### Basic Deployment on Server
+* We will get the doc directly from the updated status of the frond-end with specific shaing docID, then we will broadcast it to whole users who can get access to it.
+
+```python
+      document = Document.query.filter_by(docID=json["docID"]).first()
+      document.content = json["doc"]
+      db.session.commit()
+      socketio.emit('DOC', json, room=json["docID"])
+ ```
+##### Mayers Deployment on Server
+* For the mayer's implement, the patch which is the difference between our init_state and update_state will be used for updating DOC.
+
+```python
+      diff = myers_diff(init_state, update_state)
+      for elem in diff:
+            if isinstance(elem, Keep):
+                print(' ' + elem.line)
+            elif isinstance(elem, Insert):
+                print('+' + elem.line)
+            else:
+                print('-' + elem.line)
+```
 
 ##### OT Deployment on Server
 
